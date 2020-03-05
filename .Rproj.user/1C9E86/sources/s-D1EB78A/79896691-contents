@@ -1,0 +1,114 @@
+#Foundation of Big Data Analytics CS356T
+#Professor Amit Dave
+#Unit 1, Assignment Submission 1
+
+#OBJECTIVES:
+#1)Read and review the dataset
+#2)Print the summaray
+#3)Use Predictive analytics to determine the possible winner 
+#  of World Cup 2019
+
+##set destination
+setwd("C:/Pluralsight")
+
+#read csv file
+result <- read.csv("results.csv")
+
+#read csv file
+regions <- read.csv("regionCountry.csv", stringsAsFactors = FALSE)
+
+#view results
+head(result)
+
+#view region
+head(regions)
+
+#load necessary libraries
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+#Process Data
+
+#Read date from table
+result$date <- as.Date(result$date, "%Y-%m-%d")
+
+#Use factor to break it down into regions
+regions$region <- factor(regions$region, 
+                         levels = c("Africa",
+                                    "Asia", "Australia","Caribbean", "Central America",
+                                    "Europe", "South America","North America"))
+
+#Adding new columns for winners and year
+result <- result %>%
+  mutate(year = as.numeric(format(date, "%Y"))) %>%
+  rowwise() %>%
+  mutate(winner = ifelse(home_score > away_score, "home",
+                         ifelse(home_score <away_score, "away", "draw")))%>%
+  ungroup()
+
+#use the as.factor() function to set the category
+#and the enumerated type
+result$winner = as.factor(result$winner)
+
+#Inspect result
+table(result$winner)
+
+#select a subset of columns year, winner and country
+temp <- select(            #to select specific columns
+  .data = result,
+  year ,
+  winner,
+  country,
+  tournament)
+
+head(temp)
+
+#create a simple regression model, year is the function of winner
+model <- lm(
+  formula = year ~ winner,
+  data = result)
+
+#Prediction based off the linear regression model, how counts of winds correalate with year
+summary(model)
+
+#Predictions of wins explained by year (Predictor)
+#Estimate Std. Error  t value Pr(>|t|)    
+#(Intercept) 1988.9427     0.2251 8834.529   <2e-16 ***
+# winnerdraw     2.8984     0.3356    8.636   <2e-16 ***
+# winnerhome     0.6740     0.2830    2.381   0.0173 * 
+
+#Inspect temp
+head(temp)
+
+#Use the summary function to summarize the table result
+summary(result)
+
+#summary of year winner and country
+summary(temp)
+
+
+
+####################################### gathering together the "home_team" and the "away_team" columns to have them all in one column:
+
+temp %>%
+  filter(tournament == "FIFA World Cup") %>%
+  filter(year == "2019") %>%
+  group_by(desc(year)) %>%
+  summarize(winners = n_distinct(winner)) %>%
+  arrange(desc(winners))
+temp %>%
+  head(arrange(country,desc(year)), n = 90)%>%
+  ggplot(.,aes(x = country, y = tournament)) +
+  geom_bar(stat = "identity")
+
+#create a scatter plot Fifa worldcup score
+plot(
+  x = temp$tournament,
+  y = temp$winner,
+  main = "hometeam and away team",
+  xlab = "country",
+  ylab = "away_score")
+
+
+
