@@ -2,7 +2,6 @@
 
 Read and review the dataset
 
-Print the summary
-
-Use R programming language to create descriptive statistics, data visualizations, and statistical models.
-Also, handling Big Data to make predictions using machine learning to determine the possible winner of World Cup 2019
+World Cup 2019 – Predictive Analysis with R                                                                               GitHub
+R Studio | MapReduce Aggregation | Data Source: Kaggle
+Analyzed big data and generated descriptive statistics, data visualizations, and statistical models using a machine learning algorithm in R Studio to predict the 
